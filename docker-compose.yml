@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      MONGO_URI: "mongodb://mongo/your_app?authSource=admin"
+      MONGO_USER: "user"
+      MONGO_PASSWORD: "password"
+    volumes:
+      - ./backend/cmd:/app/cmd
+      - ./backend/internal:/app/internal
+    depends_on:
+      - mongo
+    ports:
+      - "8080:8080"
+
+  mongo:
+    image: mongo:7.0.12
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: your_app
+    volumes:
+      - "mongo:/data/db"
+      - "./dev/init-db.js:/docker-entrypoint-initdb.d/init-db.js"
+    expose:
+      - "27017"
+    restart: unless-stopped
+
+volumes:
+  mongo:
+  temp-backend:
