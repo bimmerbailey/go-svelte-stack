@@ -14,16 +14,17 @@ func main() {
 	apiRouter := app.Group("/api")
 	V1Router := apiRouter.Group("/v1")
 	client, mongoErr := database.ConnectMongoDb()
-
 	if mongoErr != nil {
 		log.Fatal(mongoErr)
+		return
 	}
+	mongoDB := client.Database("your_app")
 
 	collectionNames := []string{"users", "items"}
-	database.InitializeCollections(client, "your_app", collectionNames)
+	database.InitializeCollections(mongoDB, collectionNames)
 
 	routes.HealthRoutes(apiRouter, client)
-	routes.UsersRoutes(V1Router, client)
+	routes.UsersRoutes(V1Router, mongoDB)
 
 	err := app.Run(":8080")
 
