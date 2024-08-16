@@ -20,6 +20,7 @@ func main() {
 	}
 	mongoDB := client.Database("your_app")
 
+	// FIXME: Not a fan of this
 	collectionNames := []string{"users", "items"}
 	database.InitializeCollections(mongoDB, collectionNames)
 
