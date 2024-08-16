@@ -51,11 +51,10 @@ func CloseMongoClient(client *mongo.Client) {
 	slog.Info("Mongo client disconnected")
 }
 
-func InitializeCollections(client *mongo.Client, databaseName string, collections []string) {
+func InitializeCollections(db *mongo.Database, collections []string) {
 	for i := 0; i < len(collections); i++ {
 		slog.Info("Initializing mongo collection", "collection", collections[i])
-		database := client.Database(databaseName)
-		err := database.CreateCollection(context.Background(), collections[i])
+		err := db.CreateCollection(context.Background(), collections[i])
 		if err != nil {
 			panic(err)
 		}
