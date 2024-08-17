@@ -67,6 +67,18 @@ func (collection Collection[T]) GetDocuments() ([]T, error) {
 	return docs, err
 }
 
+func (collection Collection[T]) GetDocumentByID(id string) (T, error) {
+	ctx, cancel := DefaultContext()
+	defer cancel()
+	var document T
+	documentID, conversionError := primitive.ObjectIDFromHex(id)
+	if conversionError != nil {
+		return document, conversionError
+	}
+	err := collection.collection.FindOne(ctx, bson.M{"_id": documentID}).Decode(&document)
+	return document, err
+}
+
 type User struct {
 	DocumentBase `bson:",inline"`
 	FirstName    string `bson:"first_name" json:"first_name"`
