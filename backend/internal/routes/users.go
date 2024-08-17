@@ -2,10 +2,9 @@ package routes
 
 import (
 	database "backend/internal/database/mongo"
+	"backend/internal/handlers"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
-	"net/http"
 )
 
 type GetUsers struct {
@@ -15,34 +14,9 @@ type GetUsers struct {
 
 func UsersRoutes(router *gin.RouterGroup, db *mongo.Database) {
 	collection := database.GetCollection[*database.User](db, "users")
-	router.GET("/users", func(c *gin.Context) {
-		// FIXME: users should be [] w/o users not null
-		users, err := collection.GetDocuments()
-		if err != nil {
-			log.Fatal(err)
-		}
-		c.JSON(http.StatusOK, GetUsers{Users: users, Count: len(users)})
-	})
+	handler := handlers.NewUserHandler(collection)
 
-	router.GET("/users/:name", func(c *gin.Context) {
-		name := c.Param("name")
-		c.JSON(http.StatusOK, gin.H{
-			"user": name,
-		})
-	})
-
-	router.POST("/users", func(c *gin.Context) {
-		var newUser database.User
-		if err := c.BindJSON(&newUser); err != nil {
-			return
-		}
-		user, err := collection.Insert(&newUser)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		c.JSON(http.StatusCreated, gin.H{
-			"user": user,
-		})
-	})
+	router.GET("/users", handler.GetUsers)
+	router.GET("/users/:id", handler.GetById)
+	router.POST("/users", handler.Insert)
 }
