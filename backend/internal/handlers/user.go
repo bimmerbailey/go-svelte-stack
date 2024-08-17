@@ -4,6 +4,7 @@ import (
 	database "backend/internal/database/mongo"
 	"github.com/gin-gonic/gin"
 	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -60,8 +61,16 @@ func (handler *userHandler) GetById(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// Delete TODO:
 func (handler *userHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
-	c.JSON(http.StatusOK, id)
+	deleted, err := handler.collection.DeleteDocument(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if deleted == 0 {
+		slog.Warn("User not deleted", "id", id)
+	} else {
+		slog.Info("User deleted", "id", id, "count", deleted)
+	}
+	c.JSON(http.StatusOK, gin.H{"count": deleted})
 }

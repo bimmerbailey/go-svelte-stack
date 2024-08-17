@@ -79,6 +79,22 @@ func (collection Collection[T]) GetDocumentByID(id string) (T, error) {
 	return document, err
 }
 
+func (collection Collection[T]) DeleteDocument(id string) (int64, error) {
+	ctx, cancel := DefaultContext()
+	defer cancel()
+	documentID, conversionError := primitive.ObjectIDFromHex(id)
+	if conversionError != nil {
+		return 0, conversionError
+	}
+	result, err := collection.collection.DeleteOne(ctx, bson.M{"_id": documentID})
+	if err != nil {
+		slog.Warn("Failed to delete document", "id", id, "err", err)
+		return 0, bson.ErrDecodeToNil
+	}
+
+	return result.DeletedCount, nil
+}
+
 type User struct {
 	DocumentBase `bson:",inline"`
 	FirstName    string `bson:"first_name" json:"first_name"`

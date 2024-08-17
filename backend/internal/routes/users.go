@@ -19,4 +19,5 @@ func UsersRoutes(router *gin.RouterGroup, db *mongo.Database) {
 	router.GET("/users", handler.GetUsers)
 	router.GET("/users/:id", handler.GetById)
 	router.POST("/users", handler.Insert)
+	router.DELETE("/users/:id", handler.Delete)
 }
