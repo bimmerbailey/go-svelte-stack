@@ -34,8 +34,9 @@ type DocumentBase struct {
 }
 
 func (doc *DocumentBase) BeforeInsert() error {
-	doc.CreatedAt = time.Now().UTC()
-	doc.UpdatedAt = doc.CreatedAt
+	now := time.Now().UTC()
+	doc.CreatedAt = now
+	doc.UpdatedAt = now
 	return nil
 }
 
