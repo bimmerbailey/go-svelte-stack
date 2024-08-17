@@ -3,7 +3,6 @@ package handlers
 import (
 	database "backend/internal/database/mongo"
 	"github.com/gin-gonic/gin"
-	"log"
 	"log/slog"
 	"net/http"
 )
@@ -30,13 +29,15 @@ type GetUsers struct {
 
 func (handler *userHandler) GetUsers(c *gin.Context) {
 	// FIXME: users should be [] w/o users not null, if possible
-	// FIXME: Allow params for filtering
+	// FIXME: Allow params for filtering https://gin-gonic.com/docs/examples/bind-query-or-post/
 	// FIXME: Better way to get count of documents
 	users, err := handler.collection.GetDocuments()
 	if err != nil {
-		log.Fatal(err)
+		slog.Warn("Error getting users", "error", err)
+		c.String(http.StatusInternalServerError, err.Error())
+	} else {
+		c.JSON(http.StatusOK, GetUsers{Users: users, Count: len(users)})
 	}
-	c.JSON(http.StatusOK, GetUsers{Users: users, Count: len(users)})
 }
 
 func (handler *userHandler) Insert(c *gin.Context) {
@@ -46,31 +47,32 @@ func (handler *userHandler) Insert(c *gin.Context) {
 	}
 	user, err := handler.collection.Insert(&newUser)
 	if err != nil {
-		log.Fatal(err)
+		slog.Warn("Error inserting user", "error", err)
+		c.String(http.StatusInternalServerError, err.Error())
+	} else {
+		c.JSON(http.StatusCreated, user)
 	}
-
-	c.JSON(http.StatusCreated, user)
 }
 
 func (handler *userHandler) GetById(c *gin.Context) {
 	id := c.Param("id")
 	user, err := handler.collection.GetDocumentByID(id)
 	if err != nil {
-		log.Fatal(err)
+		slog.Warn("User not found", "id", id, "err", err)
+		c.String(http.StatusNotFound, "User %s not found", id)
+	} else {
+		c.JSON(http.StatusOK, user)
 	}
-	c.JSON(http.StatusOK, user)
 }
 
 func (handler *userHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	deleted, err := handler.collection.DeleteDocument(id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if deleted == 0 {
-		slog.Warn("User not deleted", "id", id)
+	if err != nil || deleted == 0 {
+		slog.Warn("Problem deleting user", "id", id, "err", err)
+		c.String(http.StatusNotFound, "User %s not found", id)
 	} else {
 		slog.Info("User deleted", "id", id, "count", deleted)
+		c.String(http.StatusOK, "User %s deleted", id)
 	}
-	c.JSON(http.StatusOK, gin.H{"count": deleted})
 }
