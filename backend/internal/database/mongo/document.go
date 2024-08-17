@@ -8,6 +8,8 @@ import (
 type Document interface {
 	SetID(id string)
 	GetID() string
+
+	ObjectID() (primitive.ObjectID, error)
 }
 
 // Doc TODO: We might have to convert id to ObjectID to get by id
@@ -23,7 +25,7 @@ func (doc *Doc) GetID() string {
 	return doc.ID
 }
 
-func (doc *Doc) PrepareId() (primitive.ObjectID, error) {
+func (doc *Doc) ObjectID() (primitive.ObjectID, error) {
 	return primitive.ObjectIDFromHex(doc.ID)
 }
 
