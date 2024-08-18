@@ -35,11 +35,9 @@ func main() {
 		responses.StringResponse(w, http.StatusMethodNotAllowed, "method is not valid")
 	})
 
-	// "/api"
 	app.Route("/api", func(r chi.Router) {
 		routes.HealthRoutes(r, client)
 	})
-	// "/v1"
 	app.Route("/api/v1", func(r chi.Router) {
 		routes.UsersRoutes(r, mongoDB)
 	})

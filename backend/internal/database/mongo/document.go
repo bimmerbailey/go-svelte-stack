@@ -12,7 +12,6 @@ type Document interface {
 	ObjectID() (primitive.ObjectID, error)
 }
 
-// Doc TODO: We might have to convert id to ObjectID to get by id
 type Doc struct {
 	ID string `bson:"_id,omitempty" json:"id"`
 }

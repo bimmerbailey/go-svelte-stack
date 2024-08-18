@@ -3,6 +3,7 @@ package routes
 import (
 	"backend/internal/responses"
 	"context"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log/slog"
@@ -23,22 +24,11 @@ func HealthRoutes(router chi.Router, client *mongo.Client) {
 			slog.Info("Can't connect to database", "error", ctxErr)
 		}
 
-		// TODO: Format the sting
-		dateNow := time.Now().Local()
-
 		if err := client.Ping(ctx, nil); err != nil {
-			responses.InternalServerError(
-				"Status unhealthy",
-				err,
-				map[string]interface{}{
-					"Data": "Please check the Client",
-					"Time": dateNow.String(),
-				},
-			)
+			responses.InternalServerError(w, err)
+			return
 		}
-		responses.JsonResponse(w, http.StatusOK, map[string]interface{}{
-			"Data": "The MongoDB client is working successfully",
-			"Date": dateNow.String(),
-		})
+		dateNow := time.Now().UTC()
+		responses.StringResponse(w, http.StatusOK, fmt.Sprintf("Successfully pinged database at %s", dateNow))
 	})
 }
