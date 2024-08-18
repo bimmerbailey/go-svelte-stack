@@ -9,6 +9,7 @@ services:
     volumes:
       - ./backend/cmd:/app/cmd
       - ./backend/internal:/app/internal
+      - ./backend/development:/app/development
     depends_on:
       - mongo
     ports:

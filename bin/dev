@@ -12,6 +12,10 @@ dump() {
   docker compose down --volumes
 }
 
+populate() {
+  docker compose run backend go run development/main.go
+}
+
 shell() {
   if [[ "$1" = "mongo" ]]; then
     docker compose exec -it mongo mongosh -u user -p password
