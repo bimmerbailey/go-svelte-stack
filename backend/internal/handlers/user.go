@@ -37,9 +37,9 @@ func (handler *userHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Warn("Error getting users", "error", err)
 		responses.StringResponse(w, http.StatusInternalServerError, err.Error())
-	} else {
-		responses.JsonResponse(w, http.StatusOK, GetUsers{Users: users, Count: len(users)})
+		return
 	}
+	responses.JsonResponse(w, http.StatusOK, GetUsers{Users: users, Count: len(users)})
 }
 
 func (handler *userHandler) Insert(w http.ResponseWriter, r *http.Request) {
@@ -52,9 +52,9 @@ func (handler *userHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Warn("Error inserting user", "error", err)
 		responses.StringResponse(w, http.StatusInternalServerError, err.Error())
-	} else {
-		responses.JsonResponse(w, http.StatusCreated, user)
+		return
 	}
+	responses.JsonResponse(w, http.StatusCreated, user)
 }
 
 func (handler *userHandler) GetById(w http.ResponseWriter, r *http.Request) {
@@ -64,9 +64,9 @@ func (handler *userHandler) GetById(w http.ResponseWriter, r *http.Request) {
 		slog.Warn("User not found", "id", id, "err", err)
 		errorMessage := fmt.Sprintf("User %s not found", id)
 		responses.StringResponse(w, http.StatusNotFound, errorMessage)
-	} else {
-		responses.JsonResponse(w, http.StatusOK, user)
+		return
 	}
+	responses.JsonResponse(w, http.StatusOK, user)
 }
 
 func (handler *userHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -76,8 +76,8 @@ func (handler *userHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		slog.Warn("Problem deleting user", "id", id, "err", err)
 		errorMessage := fmt.Sprintf("User %s not found", id)
 		responses.StringResponse(w, http.StatusNotFound, errorMessage)
-	} else {
-		slog.Info("User deleted", "id", id, "count", deleted)
-		responses.StringResponse(w, http.StatusOK, fmt.Sprintf("User %s deleted", id))
+		return
 	}
+	slog.Info("User deleted", "id", id, "count", deleted)
+	responses.StringResponse(w, http.StatusOK, fmt.Sprintf("User %s deleted", id))
 }
