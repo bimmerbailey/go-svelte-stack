@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/internal/database/mongo"
+	database "backend/internal/database/mongo"
 	"backend/internal/responses"
 	"backend/internal/routes"
 	"github.com/go-chi/chi/v5"
