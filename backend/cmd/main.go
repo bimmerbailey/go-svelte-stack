@@ -5,6 +5,7 @@ import (
 	"backend/internal/responses"
 	"backend/internal/routes"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 )
@@ -23,6 +24,10 @@ func main() {
 	database.InitializeCollections(mongoDB, collectionNames)
 
 	app := chi.NewRouter()
+	// TODO: Look into using slog
+	app.Use(middleware.Logger)
+	app.Use(middleware.Recoverer)
+
 	app.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		responses.StringResponse(w, http.StatusNotFound, "route not found")
 	})
