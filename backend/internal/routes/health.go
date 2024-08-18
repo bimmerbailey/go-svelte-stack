@@ -1,24 +1,22 @@
 package routes
 
 import (
-	utils "backend/internal"
+	"backend/internal/responses"
 	"context"
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log/slog"
 	"net/http"
 	"time"
 )
 
-func HealthRoutes(router *gin.RouterGroup, client *mongo.Client) {
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"okay": true,
-		})
+func HealthRoutes(router chi.Router, client *mongo.Client) {
+	router.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		responses.StringResponse(w, http.StatusOK, "Healthy")
 	})
 
-	router.GET("/readyz", func(c *gin.Context) {
-		ctx, ctxErr := context.WithTimeout(c.Request.Context(), time.Duration(3000)*time.Second)
+	router.Get("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		ctx, ctxErr := context.WithTimeout(r.Context(), time.Duration(3000)*time.Second)
 		defer ctxErr()
 
 		if ctxErr != nil {
@@ -29,7 +27,7 @@ func HealthRoutes(router *gin.RouterGroup, client *mongo.Client) {
 		dateNow := time.Now().Local()
 
 		if err := client.Ping(ctx, nil); err != nil {
-			utils.InternalServerError(
+			responses.InternalServerError(
 				"Status unhealthy",
 				err,
 				map[string]interface{}{
@@ -38,16 +36,9 @@ func HealthRoutes(router *gin.RouterGroup, client *mongo.Client) {
 				},
 			)
 		}
-
-		c.IndentedJSON(
-			http.StatusOK,
-			utils.Response(
-				"Pong",
-				map[string]interface{}{
-					"Data": "The MongoDB client is working successfully",
-					"Date": dateNow.String(),
-				},
-			),
-		)
+		responses.JsonResponse(w, http.StatusOK, map[string]interface{}{
+			"Data": "The MongoDB client is working successfully",
+			"Date": dateNow.String(),
+		})
 	})
 }

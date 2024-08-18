@@ -1,23 +1,18 @@
 package routes
 
 import (
-	database "backend/internal/database/mongo"
+	"backend/internal/database/mongo"
 	"backend/internal/handlers"
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type GetUsers struct {
-	Users []*database.User `json:"users"`
-	Count int              `json:"count"`
-}
-
-func UsersRoutes(router *gin.RouterGroup, db *mongo.Database) {
+func UsersRoutes(router chi.Router, db *mongo.Database) {
 	collection := database.GetCollection[*database.User](db, "users")
 	handler := handlers.NewUserHandler(collection)
 
-	router.GET("/users", handler.GetUsers)
-	router.GET("/users/:id", handler.GetById)
-	router.POST("/users", handler.Insert)
-	router.DELETE("/users/:id", handler.Delete)
+	router.Get("/users", handler.GetUsers)
+	router.Get("/users/{id}", handler.GetById)
+	router.Post("/users", handler.Insert)
+	router.Delete("/users/{id}", handler.Delete)
 }
