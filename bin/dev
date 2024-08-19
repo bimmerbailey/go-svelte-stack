@@ -13,7 +13,7 @@ dump() {
 }
 
 populate() {
-  docker compose run backend go run development/main.go
+  docker compose run --rm backend go run development/main.go
 }
 
 shell() {
