@@ -15,6 +15,17 @@ services:
     ports:
       - "8080:8080"
 
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
   mongo:
     image: mongo:7.0.12
     environment:
