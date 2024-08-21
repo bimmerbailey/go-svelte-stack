@@ -59,7 +59,7 @@ func (collection Collection[T]) GetDocuments() ([]T, error) {
 		return nil, err
 	}
 
-	err = cur.All(context.TODO(), &docs)
+	err = cur.All(ctx, &docs)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,12 +93,4 @@ func (collection Collection[T]) DeleteDocument(id string) (int64, error) {
 	}
 
 	return result.DeletedCount, nil
-}
-
-type User struct {
-	DocumentBase `bson:",inline"`
-	FirstName    string `bson:"first_name" json:"first_name"`
-	LastName     string `bson:"last_name" json:"last_name"`
-	Email        string `bson:"email" json:"email"`
-	Password     string `bson:"password" json:"password"`
 }

@@ -40,6 +40,7 @@ func main() {
 	})
 	app.Route("/api/v1", func(r chi.Router) {
 		routes.UsersRoutes(r, mongoDB)
+		routes.ItemsApiRoutes(r, mongoDB)
 	})
 
 	err := http.ListenAndServe(":8080", app)
